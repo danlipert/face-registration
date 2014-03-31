@@ -38,6 +38,19 @@ def data_view(self, request):
         info = {'orientation': img.get_orientation()}
         return Response(json.dumps(info), content_type='application/json')
 
+@view_config(route_name='save')
+def save_view(self, request):
+    left_eye_x = int(request.GET['left_eye_x'])
+    left_eye_y = int(request.GET['left_eye_y'])
+    right_eye_x = int(request.GET['right_eye_x'])
+    right_eye_y = int(request.GET['right_eye_y'])
+
+    response = Response()
+    response.status = "200 OK"
+    response.status_int = 200
+    response.content_type = "text/plain"
+    return response
+
 def init():
     p = argparse.ArgumentParser()
     p.add_argument('picture_path')
@@ -59,6 +72,7 @@ def run():
     config.add_route('all', '/image')
     config.add_route('image', '/image/{id}')
     config.add_route('data', '/data/{id}')
+    config.add_route('save', '/save/{id}')
     config.scan()
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 8080, app)
