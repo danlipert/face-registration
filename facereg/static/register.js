@@ -18,7 +18,7 @@ window.onload = function() {
 
 function recompute_transformation() {
 	transformation = new Transformation();
-	transform(transformation);
+	//transform(transformation);
 }
 
 function get_image() {
@@ -126,7 +126,7 @@ function transform(obj) {
 	obj.translate(cwidth/2, cheight/2);
 	switch (data.orientation) {
 	case 1:
-		obj.rotate(Math.PI);
+		//obj.rotate(Math.PI);
 		break;
 	case 3:
 		break;
@@ -195,9 +195,9 @@ function redraw() {
 function calculateRotation(markers) {
     marker1 = markers[0]
     marker2 = markers[1]
-    deltaX = marker1[0] - marker2[0]
-    deltaY = marker1[1] - marker2[1]
-    angle = Math.atan2(deltaX, deltaY)
+    deltaX = marker2[0] - marker1[0]
+    deltaY = marker2[1] - marker1[1]
+    angle = -1* Math.atan2(deltaY, deltaX)
     console.log(angle)
     return angle
 }

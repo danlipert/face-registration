@@ -1,2 +1,3 @@
 #!/bin/sh
-python -m facereg.run /home/dan/hyperlayer/facerec/face-registration/facereg/image
+python -m facereg.run '/home/danlipert/ppbdata/Sex Offender Images 2013'
+
