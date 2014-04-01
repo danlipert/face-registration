@@ -7,6 +7,7 @@ import os
 import sys
 import json
 from . import image
+import pyramid.httpexceptions as exc
 
 srcdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,12 +45,14 @@ def save_view(self, request):
     left_eye_y = int(request.GET['left_eye_y'])
     right_eye_x = int(request.GET['right_eye_x'])
     right_eye_y = int(request.GET['right_eye_y'])
+    image_path = request.GET['image_path']
+    #get last part of path
+    image_name = image_path.split('/')[-1]
+    eye_data = {'image_name':image_name, 'left_eye_x':left_eye_x,'left_eye_y':left_eye_y,'right_eye_x':right_eye_x,'right_eye_y':right_eye_y}
+    json.dump(eye_data, open("%s.eyes" % image_name, "wb"))
+    image_number = int(request.GET['num'])
+    raise exc.HTTPFound(request.route_url("image", id=image_number+1))   # Redirect
 
-    response = Response()
-    response.status = "200 OK"
-    response.status_int = 200
-    response.content_type = "text/plain"
-    return response
 
 def init():
     p = argparse.ArgumentParser()
@@ -72,7 +75,7 @@ def run():
     config.add_route('all', '/image')
     config.add_route('image', '/image/{id}')
     config.add_route('data', '/data/{id}')
-    config.add_route('save', '/save/{id}')
+    config.add_route('save', '/save')
     config.scan()
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 8080, app)

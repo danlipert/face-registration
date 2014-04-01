@@ -4,8 +4,12 @@ var transformation;
 var selection = null;
 var dragging = false;
 var CLICK_RADIUS = 12;
+var imageNumber = null;
 
 window.onload = function() {
+    //get image number for redirect use
+    var url = document.URL;
+    imageNumber = url.split('/').pop();
 	canvas = document.getElementById("canvas");
 	canvas.addEventListener('mousedown', handle_mousedown);
 	canvas.addEventListener('mousemove', handle_mousemove);
@@ -21,15 +25,24 @@ function recompute_transformation() {
 	//transform(transformation);
 }
 
+function size_canvas_to_fit() {
+    canvas.width = image.width;
+    canvas.height = image.height;
+    redraw();
+}
+
 function get_image() {
 	image = new Image();
 	image.onload = function(e) {
 		counter--;
 		if (counter == 0)
+		    size_canvas_to_fit();
 			redraw();
 	}
 	image.src = image_uri;
 }
+
+
 
 function get_data() {
 	var req = new XMLHttpRequest();
@@ -152,6 +165,15 @@ function transform(obj) {
 	obj.translate(-iwidth/2, -iheight/2);
 }
 
+function enable_saving() {
+    $('#controls').html('<a href="/save?num='+imageNumber+'&image_path='+image_uri+'&left_eye_x='+data.markers[0][0]+'&left_eye_y='+data.markers[0][1]+'&right_eye_x='+data.markers[1][0]+'&right_eye_y='+data.markers[1][1]+'">Save</a>');
+}
+
+function disable_saving() {
+    $('#controls').html('Click the left eye, then the right eye');
+}
+
+
 function redraw() {
 	cxt.fillStyle = "rgb(40, 40, 40)";
 	cxt.fillRect(0, 0, canvas.width, canvas.height);
@@ -163,18 +185,23 @@ function redraw() {
 	var iwidth = image.width;
 	var iheight = image.height;
 	
-
-
 	var markers = data.markers;
 	if (markers && markers.length == 2)
     {
     	cxt.translate(iwidth/2, iheight/2)
-	    cxt.rotate(calculateRotation(markers));
+	    //cxt.rotate(calculateRotation(markers));
 	    cxt.drawImage(image, -iwidth/2, -iheight/2);
 	    cxt.translate(-iwidth/2, -iheight/2)
 	    cxt.restore();
-	    markers.length = 0
+	    enable_saving();
+	} else if (markers && markers.length == 3)
+	{
+	    markers.length=0;
+	    disable_saving();
+	    cxt.drawImage(image, 0, 0);
+        cxt.restore();
 	} else {
+	    disable_saving();
 	    cxt.drawImage(image, 0, 0);
 	    cxt.restore();
 	}
@@ -183,9 +210,9 @@ function redraw() {
 		for (var i = 0; i < markers.length; i++) {
 			var pos = mat_vector(transformation.forward, markers[i]);
 			if (i == selection) {
-				cxt.fillStyle = "rgb(255, 255, 0)";
+				cxt.fillStyle = "rgba(255, 255, 0, 0.5)";
 			} else {
-				cxt.fillStyle = "rgb(255, 0, 0)";
+				cxt.fillStyle = "rgba(255, 0, 0, 0.5)";
 			}
 			cxt.fillRect(pos[0] - 5, pos[1] - 5, 10, 10);
 		}
