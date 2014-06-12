@@ -13,3 +13,5 @@ Change the path to point to the directory containing the images that you
 want to perform face registration on.  Then browse to:
 
     http://localhost:8080/image/0
+
+Use -o option on face.run in run.sh to output .meta files to the same directory as the images.
