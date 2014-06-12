@@ -49,7 +49,7 @@ def save_view(self, request):
     #get last part of path
     image_name = image_path.split('/')[-1]
     eye_data = {'image_name':image_name, 'left_eye_x':left_eye_x,'left_eye_y':left_eye_y,'right_eye_x':right_eye_x,'right_eye_y':right_eye_y}
-    json.dump(eye_data, open("%s.eyes" % image_name, "wb"))
+    json.dump(eye_data, open(os.path.join(OUTPUTDIR, "%s.meta" % image_name), "wb"))
     image_number = int(request.GET['num'])
     raise exc.HTTPFound(request.route_url("image", id=image_number+1))   # Redirect
 
@@ -57,9 +57,16 @@ def save_view(self, request):
 def init():
     p = argparse.ArgumentParser()
     p.add_argument('picture_path')
+    p.add_argument('-o', '--outputtoimagedirectory', help="Output .meta files to image directory", action="store_true")
     args = p.parse_args()
     global DATA
     DATA = ImageSet(args.picture_path)
+    global OUTPUTDIR
+    if args.outputtoimagedirectory:
+        OUTPUTDIR = args.picture_path
+    else:
+        OUTPUTDIR = os.getcwd()
+
 
 def run():
     init()
